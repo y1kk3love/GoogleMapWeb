@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>SoundStoryRoad</title>
+
+    <style>
+        #map {
+            width: 100%;
+            height: 800px;
+        }
+
+        #playerLayer {
+            width: 100%;
+            height: 10000px;
+        }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLftcbg9h68Ed77YDtMRY5704lcVVIV1M&callback=initMap"
+        async defer></script>
+
+    <script>
+
+        function showMarker() {
+
+            var mrhi = new google.maps.LatLng(37.568560, 126.980186);
+
+            window.navigator.geolocation.getCurrentPosition(function (position) { //OK
+                mrhi = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            },
+                function (error) { //error
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            str = "Permisson_Denied";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            str = "Position_Unavailable";
+                            break;
+                        case error.TIMEOUT:
+                            str = "Time_Out";
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            str = "Unknown_Error";
+                            break;
+                    }
+
+                    mrhi = new google.maps.LatLng(37.568560, 126.980186);
+                });
+
+            var opts = {
+                center: mrhi,
+                zoom: 19
+            };
+
+            var map = new google.maps.Map(document.getElementById('map'), opts);
+
+            var marker = new google.maps.Marker({
+                position: mrhi,
+                icon: "./img/DoubleMe.png",
+                title: "(주)DoubleMe",
+                map: map
+            });
+
+            marker.addListener('click', function () {
+                open('https://www.doubleme.me/', '_blank');
+            });
+
+            var pharmacys = [
+                ['청계천', 37.569076, 126.979257],
+                ['청계광장', 37.569212, 126.977764],
+                ['보신각', 37.569766, 126.983518],
+                ['광통교', 37.568937, 126.981118]
+            ];
+
+            var images = [
+                ["./img/(G)I-DLE.png"],
+                ["./img/IU.png"],
+                ["./img/AKMU.png"],
+                ["./img/BTS.png"]
+            ];
+
+            var urlIds = [
+                ['fCO7f0SmrDc'],
+                ['iOKRYIMhaDk'],
+                ['0Oi8jDMvd_w'],
+                ['WMweEpGlu_U']
+            ];
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            for (var i = 0; i < pharmacys.length; i++) {
+                var title = pharmacys[i][0];
+                var pos = new google.maps.LatLng(pharmacys[i][1], pharmacys[i][2]);
+                console.debug(images[i]);
+                var m = new google.maps.Marker({
+                    position: pos,
+                    title: title,
+                    icon: images[i][0],
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    url: urlIds[i][0]
+                });
+
+                m.addListener('click', function () {
+                    open('https://youtu.be/' + this.url, '_blank');
+
+                    infoWindow.close();
+                    infoWindow.setContent(this.getTitle());
+                    infoWindow.open(this.getMap(), this);
+
+                    if (this.getAnimation() == null) {
+                        this.setAnimation(google.maps.Animation.BOUNCE);
+                    } else {
+                        this.setAnimation(null);
+                    }
+                });
+
+            }
+        }  
+    </script>
+    <!--
+        //YouTube Api Testing
+
+        <script>
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: 'M7lc1UVf-VE',
+                playerVars: {
+                    'autoplay': 1,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.mute();
+            event.target.playVideo();
+        }
+
+        var done = false;
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !done) {
+                setTimeout(stopVideo, 6000);
+                done = true;
+            }
+        }
+        function stopVideo() {
+            player.unMute();
+            //player.stopVideo();
+        }
+    </script>
+    -->
+</head>
+
+<body onload="showMarker()">
+
+    <div id="map"></div>
+    <!--
+    <div id="player"></div> 
+    -->
+</body>
+
+</html>
